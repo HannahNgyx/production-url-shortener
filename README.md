@@ -51,3 +51,11 @@ Stop the server with Ctrl+C.
 `/docs` is useful for POST. Redirects in `/docs` may show “Failed to fetch” (browser CORS after 302). Use the address bar or copy-paste the code instead.
 
 Prove durability: POST, restart uvicorn, GET the same code — still 302.
+
+## Tests
+
+Postgres must be running and `.env` must define `DATABASE_URL` (same as running the app). From the project root, with the venv active:
+
+```powershell
+python -m pytest -q
+```
