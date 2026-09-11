@@ -7,6 +7,7 @@ import os # for environment variables
 from contextlib import asynccontextmanager #FastAPI protocol requires async context manager 
 import psycopg # for PostgreSQL database connection
 from dotenv import load_dotenv # for loading environment variables
+from urllib.parse import urlparse # for parsing the URL
 
 load_dotenv() # load the environment variables 
 
@@ -37,6 +38,14 @@ def health():
 
 @app.post("/urls")   
 def create_url(url: str):
+    url = url.strip() 
+    if not url:
+        raise HTTPException(status_code=422, detail="Empty URL")
+    if len(url) > 2048: # check if the URL is too long
+        raise HTTPException(status_code=422, detail="This URL is too long")
+    parsed_url = urlparse(url) # parse the URL
+    if not parsed_url.netloc or parsed_url.scheme not in ["http", "https"]: # check if the URL is valid
+        raise HTTPException(status_code=422, detail="Invalid URL")
     code = generate_code() 
     conn = psycopg.connect(os.environ["DATABASE_URL"])
     conn.execute(
